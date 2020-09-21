@@ -75,35 +75,37 @@ class App extends React.Component {
 
     render() {
         return (
-            <main id='drum-machine' className='d-flex'>
+            <main id='drum-machine' className='d-flex justify-content-around'>
                 <h1><i className='fas fa-mug-hot'></i><em>WAO</em></h1>
                 <section id='pads' className='d-flex flex-wrap align-items-center justify-content-around'>
-                    <div className="drum-pad">Q</div>
-                    <div className="drum-pad">E</div>
-                    <div className="drum-pad">W</div>
-                    <div className="drum-pad">A</div>
-                    <div className="drum-pad">S</div>
-                    <div className="drum-pad">D</div>
-                    <div className="drum-pad">Z</div>
-                    <div className="drum-pad">X</div>
-                    <div className="drum-pad">C</div>
+                    <button className="drum-pad">Q</button>
+                    <button className="drum-pad">E</button>
+                    <button className="drum-pad">W</button>
+                    <button className="drum-pad">A</button>
+                    <button className="drum-pad">S</button>
+                    <button className="drum-pad">D</button>
+                    <button className="drum-pad">Z</button>
+                    <button className="drum-pad">X</button>
+                    <button className="drum-pad">C</button>
                 </section>
                 <section id='right-panel' className=''>
-                    <div className='row aling-items-center' style={{width: '100%', height: '100%'}}>
-                        <div id="powerSW">
-                            <h2 id='power-title' className='col-12'>Power</h2>
-                            <div className="selector col-12">
-                                <div className="inner"></div>
-                                <div className="inner"></div>
+                    <div className='d-flex flex-wrap align-items-center justify-content-center m-0' style={{width: '100%', height: '100%'}}>
+                        <div id="powerSW" className=''>
+                            <h2 id='power-title' className='text-center'>Power</h2>
+                            <div className="selector mx-auto">
+                                <div className="inner-0"></div>
+                                <div className="inner-1"></div>
                             </div>
                         </div>
                         <div id="display"></div>
-                        <div></div>
+                        <div class="slidecontainer" style={{width: '100%'}}>
+                            <input type="range" min="1" max="100" value="50" class="slider" id="myRange"/>
+                        </div>
                         <div id='bankSW'>
-                            <h2 id='bank-title'>Bank</h2>
-                            <div className="selector">
-                                <div className="inner"></div>
-                                <div className="inner"></div>
+                            <h2 id='bank-title' className='text-center'>Bank</h2>
+                            <div className="selector mx-auto">
+                                <div className="inner-0"></div>
+                                <div className="inner-1"></div>
                             </div>
                         </div>
                     </div>
