@@ -74,6 +74,7 @@ class App extends React.Component {
         this.onChangeSlider = this.onChangeSlider.bind(this)
         this.onClickSelector = this.onClickSelector.bind(this)
         this.onSliderMouseUp = this.onSliderMouseUp.bind(this)
+        this.soundPlay = this.soundPlay.bind(this)
     }
 
     newQuote() {
@@ -100,7 +101,7 @@ class App extends React.Component {
     onChangeSlider(e) {
         this.setState({
             sliderValue: e.target.value,
-            displayValue: `Volume: ${this.state.sliderValue}`
+            displayValue: `Volume: ${e.target.value}` // 如果{}內為this.state.sliderValue，獲得的值為上一個狀態的值
         })
     }
 
@@ -112,6 +113,17 @@ class App extends React.Component {
         }, 1400)
         
         clearTimeout()
+    }
+
+    soundPlay(e) {
+        const audio = e.target.children[0]
+        audio.volume = this.state.sliderValue / 100;
+        audio.play()
+        
+        
+        this.setState({
+            displayValue: e.target.id
+        })
     }
 
 
@@ -136,6 +148,15 @@ class App extends React.Component {
             powerOneStyle,
             bankZeroStyle,
             bankOneStyle;
+        
+        const pads = bankOne.map((el, index) => {
+            return (
+                <button id={el.id} className="drum-pad" onMouseUp={this.soundPlay}>
+                    {el.keyTrigger}
+                    <audio id={el.keyTrigger} className='clip' src={el.url}>q</audio>
+                </button>
+            )
+        }) 
 
         if (this.state.powerValue === true) {
             powerOneStyle = { backgroundColor: 'blue' }
@@ -153,15 +174,16 @@ class App extends React.Component {
             <main id='drum-machine' className='d-flex align-items-center justify-content-around'>
                 <h1 className='align-self-start'><i className='fas fa-mug-hot '></i><em>WAO</em></h1>
                 <section id='pads' className='d-flex flex-wrap align-items-center justify-content-around'>
-                    <button className="drum-pad">Q</button>
-                    <button className="drum-pad">E</button>
-                    <button className="drum-pad">W</button>
-                    <button className="drum-pad">A</button>
-                    <button className="drum-pad">S</button>
-                    <button className="drum-pad">D</button>
-                    <button className="drum-pad">Z</button>
-                    <button className="drum-pad">X</button>
-                    <button className="drum-pad">C</button>
+                    {/* <button id='Q' className="drum-pad" onClick={this.soundPlay} onMouseUp={this.soundPlay}>Q</button>
+                    <button id='E' className="drum-pad">E</button>
+                    <button id='W' className="drum-pad">W</button>
+                    <button id='A' className="drum-pad">A</button>
+                    <button id='S' className="drum-pad">S</button>
+                    <button id='D' className="drum-pad">D</button>
+                    <button id='Z' className="drum-pad">Z</button>
+                    <button id='X' className="drum-pad">X</button>
+                    <button id='C' className="drum-pad">C</button> */}
+                    {pads}
                 </section>
                 <section id='right-panel'>
                     <div className='d-flex flex-wrap align-items-center justify-content-center m-0' style={{ width: '100%', height: '100%' }}>
@@ -176,8 +198,8 @@ class App extends React.Component {
                             <p>{this.state.displayValue}</p>
                         </div>
                         <div className="slidecontainer d-flex" onClick={this.onClickSelector}>
-                            <input type="range" min="-1" max="101" value={this.state.sliderValue} className="slider" id="myRange"
-                                onChange={this.onChangeSlider} onMouseUp={this.onSliderMouseUp}/>
+                            <input type="range" min="0" max="100" step="1" value={this.state.sliderValue} className="slider" id="myRange"
+                                onChange={this.onChangeSlider} onMouseUp={this.onSliderMouseUp} />
                         </div>
                         <div id='bankSWDiv'>
                             <h2 id='bank-title' className='text-center'>Bank</h2>
