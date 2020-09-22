@@ -67,11 +67,13 @@ class App extends React.Component {
             sliderValue: '',
             powerValue: '',
             bankValue: '',
+            displayValue: '',
         }
         this.newQuote = this.newQuote.bind(this)
         this.getInitialState = this.getInitialState.bind(this)
         this.onChangeSlider = this.onChangeSlider.bind(this)
         this.onClickSelector = this.onClickSelector.bind(this)
+        this.onSliderMouseUp = this.onSliderMouseUp.bind(this)
     }
 
     newQuote() {
@@ -82,14 +84,15 @@ class App extends React.Component {
         let sw
         if (e.target.parentElement.id === 'powerSW' || e.target.id === 'powerSW') {
             sw = {
-                powerValue: !this.state.powerValue
+                powerValue: !this.state.powerValue,
+                displayValue: '',
             }
-        } else if (e.target.parentElement.id === 'bankSW' | e.target.id === 'bankSW') {
+        } else if (e.target.parentElement.id === 'bankSW' || e.target.id === 'bankSW') {
             sw = {
-                bankValue: !this.state.bankValue
+                bankValue: !this.state.bankValue,
             }
         }
-            
+
         this.setState(sw)
     }
 
@@ -97,7 +100,18 @@ class App extends React.Component {
     onChangeSlider(e) {
         this.setState({
             sliderValue: e.target.value,
+            displayValue: `Volume: ${this.state.sliderValue}`
         })
+    }
+
+    onSliderMouseUp() {
+        setTimeout(() => {
+            this.setState({
+                displayValue :''
+            })
+        }, 1400)
+        
+        clearTimeout()
     }
 
 
@@ -118,7 +132,7 @@ class App extends React.Component {
 
     render() {
 
-        let powerZeroStyle={},
+        let powerZeroStyle,
             powerOneStyle,
             bankZeroStyle,
             bankOneStyle;
@@ -158,10 +172,12 @@ class App extends React.Component {
                                 <div className="inner-1" style={powerOneStyle}></div>
                             </div>
                         </div>
-                        <div id="display"></div>
-                        <div className="slidecontainer d-flex align-items-center" onClick={this.onClickSelector}>
-                            <input type="range" min="1" max="100" value={this.state.sliderValue} className="slider" id="myRange"
-                                onChange={this.onChangeSlider} />
+                        <div id="display">
+                            <p>{this.state.displayValue}</p>
+                        </div>
+                        <div className="slidecontainer d-flex" onClick={this.onClickSelector}>
+                            <input type="range" min="-1" max="101" value={this.state.sliderValue} className="slider" id="myRange"
+                                onChange={this.onChangeSlider} onMouseUp={this.onSliderMouseUp}/>
                         </div>
                         <div id='bankSWDiv'>
                             <h2 id='bank-title' className='text-center'>Bank</h2>
