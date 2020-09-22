@@ -89,6 +89,9 @@ class App extends React.Component {
                 displayValue: '',
             }
         } else if (e.target.parentElement.id === 'bankSW' || e.target.id === 'bankSW') {
+            if (this.state.powerValue === false) {
+                return false
+            }
             sw = {
                 bankValue: !this.state.bankValue,
             }
@@ -99,6 +102,9 @@ class App extends React.Component {
 
 
     onChangeSlider(e) {
+        if (this.state.powerValue === false) {
+            return false    
+        }
         this.setState({
             sliderValue: e.target.value,
             displayValue: `Volume: ${e.target.value}` // 如果{}內為this.state.sliderValue，獲得的值為上一個狀態的值
@@ -116,6 +122,9 @@ class App extends React.Component {
     }
 
     soundPlay(e) {
+        if (this.state.powerValue === false) {
+            return false
+        }
         const audio = e.target.children[0]
         audio.volume = this.state.sliderValue / 100;
         audio.play()
@@ -143,7 +152,7 @@ class App extends React.Component {
 
 
     render() {
-
+        document.querySelector('body').disabled = false
         let powerZeroStyle,
             powerOneStyle,
             bankZeroStyle,
@@ -174,15 +183,6 @@ class App extends React.Component {
             <main id='drum-machine' className='d-flex align-items-center justify-content-around'>
                 <h1 className='align-self-start'><i className='fas fa-mug-hot '></i><em>WAO</em></h1>
                 <section id='pads' className='d-flex flex-wrap align-items-center justify-content-around'>
-                    {/* <button id='Q' className="drum-pad" onClick={this.soundPlay} onMouseUp={this.soundPlay}>Q</button>
-                    <button id='E' className="drum-pad">E</button>
-                    <button id='W' className="drum-pad">W</button>
-                    <button id='A' className="drum-pad">A</button>
-                    <button id='S' className="drum-pad">S</button>
-                    <button id='D' className="drum-pad">D</button>
-                    <button id='Z' className="drum-pad">Z</button>
-                    <button id='X' className="drum-pad">X</button>
-                    <button id='C' className="drum-pad">C</button> */}
                     {pads}
                 </section>
                 <section id='right-panel'>
