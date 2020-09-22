@@ -65,13 +65,31 @@ class App extends React.Component {
         super(props);
         this.state = {
             id: '',
+            sliderValue:'',
         }
         this.newQuote = this.newQuote.bind(this)
+        this.getInitialSlider = this.getInitialSlider.bind(this)
+        this.onChangeSlider = this.onChangeSlider.bind(this)
     }
 
     newQuote() {
         store.dispatch(getActionId())
     }
+
+    onChangeSlider(e) {
+        this.setState({
+            sliderValue: e.target.value
+        })
+    }
+
+    getInitialSlider() {
+        this.setState({sliderValue: '50'})
+    }
+
+    componentDidMount() {
+        this.getInitialSlider()
+    }
+
 
     render() {
         return (
@@ -98,8 +116,9 @@ class App extends React.Component {
                             </div>
                         </div>
                         <div id="display"></div>
-                        <div class="slidecontainer" style={{width: '100%'}}>
-                            <input type="range" min="1" max="100" value="50" class="slider" id="myRange"/>
+                        <div className="slidecontainer d-flex justify-content-center ">
+                            <input type="range" min="1" max="100" value={this.state.sliderValue} className="slider" id="myRange"
+                                onChange={this.onChangeSlider}/>
                         </div>
                         <div id='bankSW'>
                             <h2 id='bank-title' className='text-center'>Bank</h2>
