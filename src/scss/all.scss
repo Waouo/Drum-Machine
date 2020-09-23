@@ -59,12 +59,13 @@ h1 {
         font-weight: bolder;
         cursor: pointer;
         outline: none;
-
-        &:active {
-            box-shadow: none;
-            background-color: orange;
-        }
     }
+}
+
+.pressed {
+    box-shadow: none !important;
+    background-color: orange !important;
+    transform: translateY(5px);
 }
 
 #right-panel {

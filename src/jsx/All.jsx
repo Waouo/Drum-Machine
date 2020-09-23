@@ -1,7 +1,5 @@
 import React from 'react'
 import ReactDom from 'react-dom'
-import { Provider, connect } from 'react-redux'
-import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { bankOne, bankTwo } from './base.js'
 
 /**React */
@@ -14,31 +12,29 @@ class App extends React.Component {
             bankValue: '',
             displayValue: '',
         }
-        this.newQuote = this.newQuote.bind(this)
         this.getInitialState = this.getInitialState.bind(this)
         this.onChangeSlider = this.onChangeSlider.bind(this)
         this.onClickSelector = this.onClickSelector.bind(this)
         this.onSliderMouseUp = this.onSliderMouseUp.bind(this)
-        this.soundPlay = this.soundPlay.bind(this)
-    }
-
-    newQuote() {
-        store.dispatch(getActionId())
+        this.mouseUp = this.mouseUp.bind(this)
+        this.keyDown = this.keyDown.bind(this)
     }
 
     onClickSelector(e) {
         let sw
+        // Power Switch
         if (e.target.parentElement.id === 'powerSW' || e.target.id === 'powerSW') {
             sw = {
                 powerValue: !this.state.powerValue,
                 displayValue: '',
             }
+        // Bank Switch
         } else if (e.target.parentElement.id === 'bankSW' || e.target.id === 'bankSW') {
-            if (this.state.powerValue === false) {
-                return false
-            }
-            sw = {
-                bankValue: !this.state.bankValue,
+            if (this.state.powerValue === true) {
+                sw = {
+                    bankValue: !this.state.bankValue,
+                    displayValue: ''
+                }
             }
         }
 
@@ -47,39 +43,73 @@ class App extends React.Component {
 
 
     onChangeSlider(e) {
-        if (this.state.powerValue === false) {
-            return false    
+        // Power closed
+        if (this.state.powerValue === true) {
+            this.setState({
+                sliderValue: e.target.value,
+                displayValue: `Volume: ${e.target.value}` // 如果{}內為this.state.sliderValue，獲得的值為上一個狀態的值
+            })
         }
-        this.setState({
-            sliderValue: e.target.value,
-            displayValue: `Volume: ${e.target.value}` // 如果{}內為this.state.sliderValue，獲得的值為上一個狀態的值
-        })
     }
 
+    // When mouseUp actived in slider, reset the this.state.displayValus
     onSliderMouseUp() {
         setTimeout(() => {
             this.setState({
-                displayValue :''
+                displayValue: ''
             })
         }, 1400)
-        
+
         clearTimeout()
     }
 
-    soundPlay(e) {
-        if (this.state.powerValue === false) {
-            return false
-        }
-        const audio = e.target.children[0]
+    soundPlay(audio) {
+        audio.currentTime = 0 // Reset audio
         audio.volume = this.state.sliderValue / 100;
         audio.play()
-        
-        
-        this.setState({
-            displayValue: e.target.id
-        })
     }
 
+    buttonStyleAndState(button) {
+        button.classList.add('pressed')
+
+        this.setState({
+            displayValue: button.id
+        })
+
+        setTimeout(() => {
+            button.classList.remove('pressed')
+        }, 100)
+
+        clearTimeout()
+    }
+
+    // Button was clicked by mouse
+    mouseUp(e) {
+        if (this.state.powerValue === true) {
+            const btn = e.target
+            const audio = e.target.children[0]
+
+            this.buttonStyleAndState(btn)
+            this.soundPlay(audio)
+        }
+    }
+
+    // Button was pressed by key
+    keyDown() {
+        document.querySelector('body').addEventListener('keydown', e => {
+            if (this.state.powerValue === true) {
+                let audio
+                let matched = (e.key).match(/^[qweasdzxc]$/i)
+                if (matched) {
+                    audio = document.getElementById(matched[0].toUpperCase())
+
+                    this.buttonStyleAndState(audio.parentElement)
+
+                    this.soundPlay(audio)
+                }
+            }
+        })
+    }
 
     getInitialState() {
         this.setState({
@@ -91,26 +121,18 @@ class App extends React.Component {
 
     componentDidMount() {
         this.getInitialState()
+        this.keyDown()
     }
 
 
 
 
     render() {
-        document.querySelector('body').disabled = false
+        // Change selector
         let powerZeroStyle,
             powerOneStyle,
             bankZeroStyle,
             bankOneStyle;
-        
-        const pads = bankOne.map((el, index) => {
-            return (
-                <button id={el.id} className="drum-pad" onMouseUp={this.soundPlay}>
-                    {el.keyTrigger}
-                    <audio id={el.keyTrigger} className='clip' src={el.url}>q</audio>
-                </button>
-            )
-        }) 
 
         if (this.state.powerValue === true) {
             powerOneStyle = { backgroundColor: 'blue' }
@@ -123,6 +145,17 @@ class App extends React.Component {
         } else {
             bankZeroStyle = { backgroundColor: 'blue' }
         }
+
+        // Create pads by bankOne or bankTwo 
+        const bank = this.state.bankValue === false ? bankOne : bankTwo
+        const pads = bank.map(el => {
+            return (
+                <button key={el.id} id={el.id} className="drum-pad" onMouseUp={this.mouseUp}>
+                    {el.keyTrigger}
+                    <audio key={el.keyTrigger} id={el.keyTrigger} className='clip' src={el.url}>q</audio>
+                </button>
+            )
+        })
 
         return (
             <main id='drum-machine' className='d-flex align-items-center justify-content-around'>
@@ -161,40 +194,6 @@ class App extends React.Component {
     }
 };
 
-
-/**React-Redux */
-// const mapStateToProps = (state) => {
-//     return {
-//         author: state.authors,
-//         text: state.texts,
-//     }
-// };
-
-// const mapDispatchToProps = (dispatch) => {
-//     return {
-//         getNewQuote: () => {
-//             dispatch(getActionId())
-//         }
-//     }
-// };
-
-
-
-
-// const Container = connect(mapStateToProps, mapDispatchToProps)(Text)
-
-// class AppWrapper extends React.Component {
-//     constructor(props) {
-//         super(props);
-//     }
-//     render() {
-//         return (
-//             <Provider store={store}>
-//                 <Container />
-//             </Provider>
-//         );
-//     }
-// };
 
 
 ReactDom.render(<App />, document.getElementById('react-root'))
