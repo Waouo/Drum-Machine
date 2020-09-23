@@ -3,21 +3,95 @@ import ReactDom from 'react-dom'
 import { bankOne, bankTwo } from './base.js'
 
 /**React */
+class BtnPads extends React.Component {
+    constructor(props) {
+        super(props);
+        this.mouseUp = this.mouseUp.bind(this)
+    }
+
+    // Button was clicked by mouse
+    mouseUp(e) {
+        if (this.props.powerValue === true) {
+            const btn = e.target
+            const audio = e.target.children[0]
+
+            this.buttonStyleAndState(btn)
+            this.soundPlay(audio)
+        }
+    }
+
+    // Button was pressed by key
+    keyDown() {
+        document.querySelector('body').addEventListener('keydown', e => {
+            if (this.props.powerValue === true) {
+                let audio
+                let matched = (e.key).match(/^[qweasdzxc]$/i)
+                if (matched) {
+                    audio = document.getElementById(matched[0].toUpperCase())
+
+                    this.buttonStyleAndState(audio.parentElement)
+
+                    this.soundPlay(audio)
+                }
+            }
+        })
+    }
+
+    soundPlay(audio) {
+        audio.currentTime = 0 // Reset audio
+        audio.volume = this.props.sliderValue / 100;
+        audio.play()
+    }
+
+    buttonStyleAndState(button) {
+        button.classList.add('pressed')
+
+        this.props.onDisplayValueChange(button.id)
+
+        setTimeout(() => {
+            button.classList.remove('pressed')
+        }, 100)
+
+        clearTimeout()
+    }
+
+    componentDidMount() {
+        this.keyDown()
+    }
+
+    render() {
+        const btn = this.props.data.map(el => {
+            return (
+                <button key={el.id} id={el.id} className="drum-pad" onMouseUp={this.mouseUp}>
+                    {el.keyTrigger}
+                    <audio key={el.keyTrigger} id={el.keyTrigger} className='clip' src={el.url}>q</audio>
+                </button>
+            )
+        })
+
+        return (
+            <section id='pads' className='d-flex flex-wrap align-items-center justify-content-around'>
+                {btn}
+            </section>
+        )
+    }
+}
+
+
+
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            sliderValue: '',
-            powerValue: '',
-            bankValue: '',
+            sliderValue: 50,
+            powerValue: true,
+            bankValue: true,
             displayValue: '',
         }
-        this.getInitialState = this.getInitialState.bind(this)
         this.onChangeSlider = this.onChangeSlider.bind(this)
         this.onClickSelector = this.onClickSelector.bind(this)
         this.onSliderMouseUp = this.onSliderMouseUp.bind(this)
-        this.mouseUp = this.mouseUp.bind(this)
-        this.keyDown = this.keyDown.bind(this)
+        this.onDisplayValueChange = this.onDisplayValueChange.bind(this)
     }
 
     onClickSelector(e) {
@@ -28,7 +102,7 @@ class App extends React.Component {
                 powerValue: !this.state.powerValue,
                 displayValue: '',
             }
-        // Bank Switch
+            // Bank Switch
         } else if (e.target.parentElement.id === 'bankSW' || e.target.id === 'bankSW') {
             if (this.state.powerValue === true) {
                 sw = {
@@ -40,7 +114,6 @@ class App extends React.Component {
 
         this.setState(sw)
     }
-
 
     onChangeSlider(e) {
         // Power closed
@@ -63,69 +136,11 @@ class App extends React.Component {
         clearTimeout()
     }
 
-    soundPlay(audio) {
-        audio.currentTime = 0 // Reset audio
-        audio.volume = this.state.sliderValue / 100;
-        audio.play()
-    }
-
-    buttonStyleAndState(button) {
-        button.classList.add('pressed')
-
+    onDisplayValueChange(displayValue) {
         this.setState({
-            displayValue: button.id
+            displayValue: displayValue
         })
-
-        setTimeout(() => {
-            button.classList.remove('pressed')
-        }, 100)
-
-        clearTimeout()
-    }
-
-    // Button was clicked by mouse
-    mouseUp(e) {
-        if (this.state.powerValue === true) {
-            const btn = e.target
-            const audio = e.target.children[0]
-
-            this.buttonStyleAndState(btn)
-            this.soundPlay(audio)
-        }
-    }
-
-    // Button was pressed by key
-    keyDown() {
-        document.querySelector('body').addEventListener('keydown', e => {
-            if (this.state.powerValue === true) {
-                let audio
-                let matched = (e.key).match(/^[qweasdzxc]$/i)
-                if (matched) {
-                    audio = document.getElementById(matched[0].toUpperCase())
-
-                    this.buttonStyleAndState(audio.parentElement)
-
-                    this.soundPlay(audio)
-                }
-            }
-        })
-    }
-
-    getInitialState() {
-        this.setState({
-            sliderValue: '50',
-            powerValue: true,
-            bankValue: true,
-        })
-    }
-
-    componentDidMount() {
-        this.getInitialState()
-        this.keyDown()
-    }
-
-
-
+    }   
 
     render() {
         // Change selector
@@ -133,36 +148,35 @@ class App extends React.Component {
             powerOneStyle,
             bankZeroStyle,
             bankOneStyle;
-
+        const selectorBgc = { backgroundColor: 'blue' }
+        
         if (this.state.powerValue === true) {
-            powerOneStyle = { backgroundColor: 'blue' }
+            powerOneStyle = selectorBgc
         } else {
-            powerZeroStyle = { backgroundColor: 'blue' }
+            powerZeroStyle = selectorBgc
         }
 
         if (this.state.bankValue === true) {
-            bankOneStyle = { backgroundColor: 'blue' }
+            bankOneStyle = selectorBgc
         } else {
-            bankZeroStyle = { backgroundColor: 'blue' }
+            bankZeroStyle = selectorBgc
         }
 
-        // Create pads by bankOne or bankTwo 
+        // Create BtnPads by bankOne or bankTwo 
         const bank = this.state.bankValue === false ? bankOne : bankTwo
-        const pads = bank.map(el => {
-            return (
-                <button key={el.id} id={el.id} className="drum-pad" onMouseUp={this.mouseUp}>
-                    {el.keyTrigger}
-                    <audio key={el.keyTrigger} id={el.keyTrigger} className='clip' src={el.url}>q</audio>
-                </button>
-            )
-        })
-
+        
         return (
             <main id='drum-machine' className='d-flex align-items-center justify-content-around'>
                 <h1 className='align-self-start'><i className='fas fa-mug-hot '></i><em>WAO</em></h1>
-                <section id='pads' className='d-flex flex-wrap align-items-center justify-content-around'>
-                    {pads}
-                </section>
+                
+                <BtnPads
+                    data={bank}
+                    powerValue={this.state.powerValue}
+                    displayValue={this.state.displayValue}
+                    sliderValue={this.state.sliderValue}
+                    onDisplayValueChange={this.onDisplayValueChange}
+                />
+                
                 <section id='right-panel'>
                     <div className='d-flex flex-wrap align-items-center justify-content-center m-0' style={{ width: '100%', height: '100%' }}>
                         <div id="powerSWDiv">
