@@ -1,81 +1,8 @@
 import React from 'react'
 import ReactDom from 'react-dom'
-import { bankOne, bankTwo } from './base.js'
-
-/**React */
-class BtnPads extends React.Component {
-    constructor(props) {
-        super(props);
-        this.mouseUp = this.mouseUp.bind(this)
-    }
-
-    // Button was clicked by mouse
-    mouseUp(e) {
-        if (this.props.powerValue === true) {
-            const btn = e.target
-            const audio = e.target.children[0]
-
-            this.buttonStyleAndState(btn)
-            this.soundPlay(audio)
-        }
-    }
-
-    // Button was pressed by key
-    keyDown() {
-        document.querySelector('body').addEventListener('keydown', e => {
-            if (this.props.powerValue === true) {
-                let audio
-                let matched = (e.key).match(/^[qweasdzxc]$/i)
-                if (matched) {
-                    audio = document.getElementById(matched[0].toUpperCase())
-
-                    this.buttonStyleAndState(audio.parentElement)
-
-                    this.soundPlay(audio)
-                }
-            }
-        })
-    }
-
-    soundPlay(audio) {
-        audio.currentTime = 0 // Reset audio
-        audio.volume = this.props.sliderValue / 100;
-        audio.play()
-    }
-
-    buttonStyleAndState(button) {
-        button.classList.add('pressed')
-
-        this.props.onDisplayValueChange(button.id)
-
-        setTimeout(() => {
-            button.classList.remove('pressed')
-        }, 100)
-
-        clearTimeout()
-    }
-
-    componentDidMount() {
-        this.keyDown()
-    }
-
-    render() {
-        const btn = this.props.data.map(el => {
-            return (
-                <button key={el.id} id={el.id} className="drum-pad" onMouseUp={this.mouseUp}>
-                    {el.keyTrigger}
-                    <audio key={el.keyTrigger} id={el.keyTrigger} className='clip' src={el.url}>q</audio>
-                </button>
-            )
-        })
-
-        return (
-            <section id='pads' className='d-flex flex-wrap align-items-center justify-content-around'>
-                {btn}
-            </section>
-        )
-    }
-}
+import { bankOne, bankTwo } from './base.jsx'
+import BtnPads from './components/BtnPads.jsx'
+import Selector from './components/Selecotr.jsx'
 
 
 
@@ -179,13 +106,19 @@ class App extends React.Component {
                 
                 <section id='right-panel'>
                     <div className='d-flex flex-wrap align-items-center justify-content-center m-0' style={{ width: '100%', height: '100%' }}>
-                        <div id="powerSWDiv">
+                        {/* <div id="powerSWDiv">
                             <h2 id='power-title' className='text-center'>Power</h2>
                             <div id="powerSW" className="selector d-flex mx-auto" onClick={this.onClickSelector}>
                                 <div className="inner-0" style={powerZeroStyle}></div>
                                 <div className="inner-1" style={powerOneStyle}></div>
                             </div>
-                        </div>
+                        </div> */}
+                        <Selector 
+                            id={'powerSW'}
+                            zeroStyle={powerZeroStyle}
+                            oneStyle={powerOneStyle}
+                            onClickSelector={this.onClickSelector}
+                        />
                         <div id="display">
                             <p>{this.state.displayValue}</p>
                         </div>
@@ -193,18 +126,19 @@ class App extends React.Component {
                             <input type="range" min="0" max="100" step="1" value={this.state.sliderValue} className="slider" id="myRange"
                                 onChange={this.onChangeSlider} onMouseUp={this.onSliderMouseUp} />
                         </div>
-                        <div id='bankSWDiv'>
-                            <h2 id='bank-title' className='text-center'>Bank</h2>
-                            <div id='bankSW' className="selector d-flex mx-auto" onClick={this.onClickSelector}>
-                                <div className="inner-0" style={bankZeroStyle}></div>
-                                <div className="inner-1" style={bankOneStyle}></div>
-                            </div>
-                        </div>
+                        <Selector
+                            id={'bankSW'}
+                            zeroStyle={bankZeroStyle}
+                            oneStyle={bankOneStyle}
+                            onClickSelector={this.onClickSelector}
+                        />
                     </div>
 
                 </section>
             </main >
         )
+
+        
     }
 };
 
